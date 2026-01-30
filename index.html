@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Events Hub | Noir Edition</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #000000;
+            --surface: #ffffff;
+            --text-dark: #000000;
+            --text-light: #ffffff;
+            --text-dim: #888888;
+            --border: rgba(255, 255, 255, 0.15);
+            --border-dark: rgba(0, 0, 0, 0.1);
+            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- PAGE SYSTEM --- */
+        .page {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            padding: 40px 5%;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 25px 5%;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            border: 1px solid transparent;
+        }
+
+        .btn-white {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        .btn-white:hover {
+            background: transparent;
+            color: #fff;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #fff;
+            border-color: var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: #fff;
+        }
+
+        .btn-dark {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+            width: 100%;
+        }
+
+        .btn-dark:hover {
+            background: #333;
+        }
+
+        /* --- FORMS --- */
+        input {
+            width: 100%;
+            background: #111;
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 12px;
+            color: #fff;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #fff;
+        }
+
+        /* --- CARDS --- */
+        .card {
+            background: var(--surface);
+            color: var(--text-dark);
+            padding: 32px;
+            border-radius: 20px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+        }
+
+        /* --- SECTIONS --- */
+        #landing {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        #landing h1 {
+            font-size: clamp(3rem, 10vw, 6rem);
+            font-weight: 800;
+            line-height: 0.9;
+            margin-bottom: 20px;
+        }
+
+        #login {
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        #dashboard {
+            padding-top: 120px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 40px;
+        }
+
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .sidebar-section {
+            background: #111;
+            border: 1px solid var(--border);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .ai-result {
+            margin-top: 15px;
+            padding: 12px;
+            background: #fff;
+            color: #000;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .reg-item {
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        // --- CONFIG ---
+        const GEMINI_API_KEY = "PASTE_KEY_HERE";
+        // Gemini API can be integrated here for future AI recommendations
+    </script>
+
+    <nav id="nav">
+        <div style="font-weight: 800; letter-spacing: -1px;">CAMPUS HUB.</div>
+        <button class="btn btn-outline" style="padding: 8px 16px;" onclick="logout()">Logout</button>
+    </nav>
+
+    <section id="landing" class="page active">
+        <h1>Campus<br>Events Hub</h1>
+        <p style="color: #888; margin-bottom: 40px; font-size: 1.2rem;">Minimal. Fast. Academic.</p>
+        <button class="btn btn-white" onclick="showPage('login')">Enter Platform</button>
+    </section>
+
+    <section id="login" class="page">
+        <div class="login-box">
+            <h2 style="font-size: 2.5rem; margin-bottom: 10px;">Login</h2>
+            <p style="color: #888; margin-bottom: 30px;">Use your campus credentials</p>
+            <input type="email" id="email" placeholder="Email Address">
+            <input type="password" placeholder="Password">
+            <button class="btn btn-white" style="width: 100%;" onclick="demoLogin()">Sign In</button>
+            <button class="btn btn-outline" style="width: 100%; margin-top: 15px;" onclick="demoLogin()">Demo
+                Login</button>
+        </div>
+    </section>
+
+    <section id="dashboard" class="page">
+        <div class="grid">
+            <div>
+                <h2 style="margin-bottom: 30px;">Upcoming Events</h2>
+                <div class="event-grid" id="event-list">
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h4 style="margin-bottom: 10px;">AI Event Suggestion</h4>
+                    <p style="font-size: 0.8rem; color: #888; margin-bottom: 15px;">What are you interested in today?
+                    </p>
+                    <input type="text" id="ai-input" placeholder="e.g. Coding, Chess..."
+                        style="margin-bottom: 10px; padding: 12px;">
+                    <button class="btn btn-white" style="width:100%; padding: 12px;"
+                        onclick="getSuggestion()">Suggest</button>
+                    <div id="ai-result" class="ai-result"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h4 style="margin-bottom: 15px;">My Registrations</h4>
+                    <div id="my-registrations">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const events = [
+            { id: 1, name: "TechSprint Hackathon", date: "Oct 24", loc: "Block A" },
+            { id: 2, name: "Robotics Workshop", date: "Oct 26", loc: "Lab 2" },
+            { id: 3, name: "Cultural Night", date: "Nov 01", loc: "OAT" },
+            { id: 4, name: "Chess Tournament", date: "Nov 05", loc: "Lounge" },
+            { id: 5, name: "Startup Talk", date: "Nov 12", loc: "Auditorium" }
+        ];
+
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('nav').style.display = (id === 'dashboard') ? 'flex' : 'none';
+            if (id === 'dashboard') { renderEvents(); renderRegistrations(); }
+            window.scrollTo(0, 0);
+        }
+
+        function demoLogin() {
+            localStorage.setItem('user_session', 'active');
+            showPage('dashboard');
+        }
+
+        function logout() {
+            localStorage.removeItem('user_session');
+            showPage('landing');
+        }
+
+        function renderEvents() {
+            const container = document.getElementById('event-list');
+            container.innerHTML = events.map(ev => `
+                <div class="card">
+                    <p style="font-size: 0.7rem; font-weight: 800; color: #888; margin-bottom: 5px;">${ev.date.toUpperCase()}</p>
+                    <h3 style="margin-bottom: 15px;">${ev.name}</h3>
+                    <p style="font-size: 0.85rem; margin-bottom: 25px;">${ev.loc}</p>
+                    <button class="btn btn-dark" onclick="register(${ev.id})">Register</button>
+                </div>
+            `).join('');
+        }
+
+        function register(id) {
+            const event = events.find(e => e.id === id);
+            let myRegs = JSON.parse(localStorage.getItem('my_regs') || '[]');
+
+            if (myRegs.some(r => r.id === id)) {
+                alert("Already registered.");
+                return;
+            }
+
+            myRegs.push(event);
+            localStorage.setItem('my_regs', JSON.stringify(myRegs));
+            alert("Registration Successful!");
+            renderRegistrations();
+        }
+
+        function renderRegistrations() {
+            const container = document.getElementById('my-registrations');
+            const regs = JSON.parse(localStorage.getItem('my_regs') || '[]');
+
+            if (regs.length === 0) {
+                container.innerHTML = `<p style="font-size: 0.8rem; color: #555;">No events joined yet.</p>`;
+                return;
+            }
+
+            container.innerHTML = regs.map(r => `
+                <div class="reg-item">
+                    <span>${r.name}</span>
+                    <span style="color: #888;">${r.date}</span>
+                </div>
+            `).join('');
+        }
+
+        function getSuggestion() {
+            const input = document.getElementById('ai-input').value.toLowerCase();
+            const result = document.getElementById('ai-result');
+            result.style.display = "block";
+            result.innerText = "Thinking...";
+
+            setTimeout(() => {
+                if (input.includes('code') || input.includes('tech')) {
+                    result.innerText = "You may like: TechSprint Hackathon";
+                } else if (input.includes('robot') || input.includes('build')) {
+                    result.innerText = "You may like: Robotics Workshop";
+                } else if (input.includes('money') || input.includes('business')) {
+                    result.innerText = "You may like: Startup Talk";
+                } else {
+                    result.innerText = "You may like: Cultural Night";
+                }
+            }, 600);
+        }
+
+        // Keep session on refresh
+        if (localStorage.getItem('user_session')) {
+            showPage('dashboard');
+        }
+    </script>
+
+</body>
+
+</html>
